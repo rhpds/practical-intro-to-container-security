@@ -1,12 +1,10 @@
-:GUID: %guid%
-:markup-in-source: verbatim,attributes,quotes
 
 
-Containers provide a certain degree of process isolation via kernel namespaces. In this module, we'll examine the capabilities of a process running in a containerized namespace. Specifically we'll look at how Linux capabilities can be used to grant a particular or subset of root privileges to a process running in a container. 
+Containers provide a certain degree of process isolation via kernel namespaces. In this module, we'll examine the capabilities of a process running in a containerized namespace. Specifically we'll look at how Linux capabilities can be used to grant a particular or subset of root privileges to a process running in a container.
 
-It would be worth taking a few minutes to read this http://rhelblog.redhat.com/2016/10/17/secure-your-containers-with-this-one-weird-trick[blog post] before beginning this lab. 
+It would be worth taking a few minutes to read this http://rhelblog.redhat.com/2016/10/17/secure-your-containers-with-this-one-weird-trick[blog post] before beginning this lab.
 
-=== Capabilities
+== Capabilities
 
 Capabilities are distinct units of privilege that can be independently enabled or disabled.
 
@@ -25,11 +23,11 @@ $ *cat --number /usr/include/linux/capability.h | less*
 103 /**
 104  ** POSIX-draft defined capabilities.
 105  **/
-106 
+106
 107 /* In a system with the [_POSIX_CHOWN_RESTRICTED] option defined, this
 108    overrides the restriction of changing file ownership and group
 109    ownership. */
-110 
+110
 111 #define CAP_CHOWN            0
 ----
 --
@@ -110,7 +108,7 @@ More information can be found with `man capabilities`
 Looking at the output above, this means your user process can execute the sudo command and get full capabilities as root.
 
 
-=== Exploring the capabilities of containers
+== Exploring the capabilities of containers
 
 You will discover that the capabilities of a container are often less than what a root process has running on the host.
 
@@ -118,7 +116,7 @@ You will discover that the capabilities of a container are often less than what 
 --
 [source,subs="{markup-in-source}"]
 ----
-$ *podman run --rm -it --user=32767 %RHEL_CONTAINER% capsh --print*
+$ *podman run --rm -it --user=32767 {RHEL_CONTAINER} capsh --print*
 ----
 ----
 Current: =
@@ -134,7 +132,7 @@ that are not required.
 --
 [source,subs="{markup-in-source}"]
 ----
-$ *podman run --user=0 --rm -it %RHEL_CONTAINER% capsh --print*
+$ *podman run --user=0 --rm -it {RHEL_CONTAINER} capsh --print*
 ----
 ----
 Current: cap_chown,cap_dac_override,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_net_bind_service,cap_sys_chroot,cap_setfcap=ep
@@ -149,7 +147,7 @@ Note that even running as UID 0 we still have a reduced set of capabilities.
 --
 [source,subs="{markup-in-source}"]
 ----
-$ *sudo podman run --user=0 --rm -it --privileged %RHEL_CONTAINER% capsh --print*
+$ *sudo podman run --user=0 --rm -it --privileged {RHEL_CONTAINER} capsh --print*
 ----
 ----
 Current: =ep
@@ -161,7 +159,7 @@ Ambient set =
 The output of `capsh` is odd in this case as we see the Current capability set is listed as `=ep` which actually means *all* capabilities
 are effective (e) and permitted (p) with the equals sign (=) meaning all (all=)
 
-=== Examining container processes
+== Examining container processes
 
 We can also use `podman top` to examine the effective capabilities of a container.
 
@@ -169,7 +167,7 @@ We can also use `podman top` to examine the effective capabilities of a containe
 --
 [source,subs="{markup-in-source}"]
 ----
-$ *podman run --user=0 --name=sleepy -it -d %RHEL_CONTAINER% sleep 999*
+$ *podman run --user=0 --name=sleepy -it -d {RHEL_CONTAINER} sleep 999*
 ----
 --
 
@@ -201,16 +199,16 @@ $ *podman top -h*
 ----
 --
 
-=== Capabilities Challenge #1
+== Capabilities Challenge #1
 
-How could you determine which capabilities podman _filters_ from a _root_ process running in a container? 
+How could you determine which capabilities podman _filters_ from a _root_ process running in a container?
 
 From a previous exercise we know that a root process on the host has a capabilities mask of CapEff = `0000003fffffffff`
 From a previous exercise we know that a root process in a container has a capabilities mask of CapEff = `00000000800425fb`
 
 .Hint
 [%collapsible]
-====
+===
 Below is an example that uses the Linux binary calculator `bc` to add hexadecimal numbers `(0x9 + 0x1) = A`.
 
 [source,subs="{markup-in-source}"]
@@ -220,11 +218,11 @@ $ *echo 'obase=16;ibase=16;9+1' | bc*
 ----
 A
 ----
-====
+===
 
 .Solution
 [%collapsible]
-====
+===
 .One approach would be to use your favorite binary calculator (`bc`) to calculate the difference in `CapEff` between a host root process `(0x3fffffffff)` and a containerized root process `(0x00800425fb)`
 ----
   0x3FFFFFFFFF
@@ -247,52 +245,52 @@ $ *capsh --decode=3F7FFBDA04*
 
 0x0000003f7ffbda04=cap_dac_read_search,cap_linux_immutable,cap_net_broadcast,cap_net_admin,cap_ipc_lock,cap_ipc_owner,cap_sys_module,cap_sys_rawio,cap_sys_ptrace,cap_sys_pacct,cap_sys_admin,cap_sys_boot,cap_sys_nice,cap_sys_resource,cap_sys_time,cap_sys_tty_config,cap_mknod,cap_lease,cap_audit_write,cap_audit_control,cap_mac_override,cap_mac_admin,cap_syslog,cap_wake_alarm,cap_block_suspend,cap_audit_read
 ----
-====
+===
 
-=== Capabilities Challenge #2
+== Capabilities Challenge #2
 
-Suppose an application had a legitimate reason to change the date (ntpd, license testing, etc) How would you allow a container to change the date on the host? What capabilities are needed to allow this? 
+Suppose an application had a legitimate reason to change the date (ntpd, license testing, etc) How would you allow a container to change the date on the host? What capabilities are needed to allow this?
 
 .Run a container, save the date then try to change the date
 --
 [source,subs="{markup-in-source}"]
 ----
-$ *podman run --rm -ti --user 0 --name temp %RHEL_CONTAINER% bash*
+$ *podman run --rm -ti --user 0 --name temp {RHEL_CONTAINER} bash*
 
 ----
 ----
-%CONTAINER_PROMPT% *savethedate=$(date)*
-%CONTAINER_PROMPT% *date -s "$savethedate"*
+{CONTAINER_PROMPT} *savethedate=$(date)*
+{CONTAINER_PROMPT} *date -s "$savethedate"*
 
 date: cannot set date: Operation not permitted
 Mon Apr  8 21:45:24 UTC 2019
 
-%CONTAINER_PROMPT% *exit*
+{CONTAINER_PROMPT} *exit*
 ----
 --
 
 .Solution
 [%collapsible]
-====
+===
 .To allow a container to set the system clock, the `sys_time` capability must be added. Add this capability then try setting the date again
 [source,subs="{markup-in-source}"]
 ----
-$ *sudo podman run --rm -ti --user 0 --name temp --cap-add=sys_time %RHEL_CONTAINER% bash*
+$ *sudo podman run --rm -ti --user 0 --name temp --cap-add=sys_time {RHEL_CONTAINER} bash*
 
-*%CONTAINER_PROMPT% savethedate=$(date)*
-*%CONTAINER_PROMPT% date -s "$savethedate"*
+*{CONTAINER_PROMPT} savethedate=$(date)*
+*{CONTAINER_PROMPT} date -s "$savethedate"*
 
 Mon Apr  8 21:46:18 UTC 2019
 
-*%CONTAINER_PROMPT% exit*
+*{CONTAINER_PROMPT} exit*
 ----
-====
+===
 
-=== Capabilities Challenge #3
+== Capabilities Challenge #3
 
 You have been given a container image to deploy (`quay.io/bkozdemb/hello`). The application needs to use the `chattr` utility but must not be allowed to `chown` any files. Use what you've learned about capabilities to properly deploy this application using `podman`.
 
-.For example, `ping` succeeds but `chattr` fails. We want the opposite.  
+.For example, `ping` succeeds but `chattr` fails. We want the opposite.
 [source,subs="{markup-in-source}"]
 ----
 $ *podman run -it --name=chattr_no_chown --rm quay.io/bkozdemb/utils bash*
@@ -312,7 +310,7 @@ chattr: Operation not permitted while setting flags on file
 
 .Solution
 [%collapsible]
-====
+===
 .Drop all capabilities then add `linux_immutable`. The key with this challenge is the container must run as root because `linux_immutable` is a filtered capability.
 [source,subs="{markup-in-source}"]
 ----
@@ -352,7 +350,7 @@ rm: cannot remove 'file': Operation not permitted
 -------------------- ./file2
 ----
 
-.On the host, check the capabilities of the container. 
+.On the host, check the capabilities of the container.
 
 The `LINUX_IMMUTABLE` capability should
 be present but not `CHOWN`.
@@ -365,10 +363,10 @@ DAC_OVERRIDE,FOWNER,FSETID,KILL,LINUX_IMMUTABLE,NET_BIND_SERVICE,NET_RAW,SETFCAP
 AP,SETUID,SYS_CHROOT
 ----
 
-.Exit the container. 
+.Exit the container.
 [source,subs="{markup-in-source}"]
 ----
 # *exit*
 $
 ----
-====
+===

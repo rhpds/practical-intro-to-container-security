@@ -1,5 +1,10 @@
 # Container Security Lab with Red Hat Enterprise Linux 9
 
+WARNING: THIS HAS BEEN UPGRADED TO SHOWROOM.
+BOOKBAG IS OBSOLTE.
+
+NOTE: This environment is available on demo.redhat.com as A Practical Introduction to Container Security
+
 ## Red Hat Summit 2023.
 
 ### Deployment Options
@@ -8,8 +13,8 @@
 
 #### 2) To build on the RHPDS bastion (RedHat employees and partners)
 
-After the lab is provisioned, you should receive a email with a 
-unique *bastion public hostname* and *ssh password*. 
+After the lab is provisioned, you should receive a email with a
+unique *bastion public hostname* and *ssh password*.
 
 Example email:
 ```

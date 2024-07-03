@@ -1,5 +1,3 @@
-:GUID: %guid%
-:markup-in-source: verbatim,attributes,quotes
 
 
 === Devices
@@ -20,8 +18,8 @@ I already told you 0 times Hello world!
 --
 [source,subs="{markup-in-source}"]
 ----
-$ *podman run --device /dev/hello -it --rm %RHEL_CONTAINER% cat /dev/hello*
-%CONTAINER_PROMPT% *ls -l /dev/hello*
+$ *podman run --device /dev/hello -it --rm {RHEL_CONTAINER} cat /dev/hello*
+{CONTAINER_PROMPT} *ls -l /dev/hello*
 ----
 ----
 ls: /dev/hello: Permission denied
@@ -33,7 +31,7 @@ ls: /dev/hello: Permission denied
 [source,subs="{markup-in-source}"]
 ----
 $ *sudo setsebool container_use_devices=true*
-$ *podman run --device /dev/hello -it --rm %RHEL_CONTAINER% cat /dev/hello*
+$ *podman run --device /dev/hello -it --rm {RHEL_CONTAINER} cat /dev/hello*
 ----
 ----
 I already told you 1 times Hello world!

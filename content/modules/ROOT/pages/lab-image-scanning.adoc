@@ -1,5 +1,3 @@
-:GUID: %guid%
-:markup-in-source: verbatim,attributes,quotes
 
 
 === Image Scanning

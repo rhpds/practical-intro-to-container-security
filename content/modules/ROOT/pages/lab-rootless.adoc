@@ -1,5 +1,3 @@
-:GUID: %guid%
-:markup-in-source: verbatim,attributes,quotes
 
 
 === Rootless Containers
@@ -17,14 +15,14 @@ and host namespaces.
 --
 [source,subs="{markup-in-source}"]
 ----
-$ *podman run --name sleepy -d %RHEL_CONTAINER% sleep 999*
+$ *podman run --name sleepy -d {RHEL_CONTAINER} sleep 999*
 ----
 --
 
-Next, run `podman top` to list the processes running in the 
+Next, run `podman top` to list the processes running in the
 container. Take note of the USER and the PID. The container process appears to be running as
-the `root` user even though the container is actually running as the `lab-user`. This is 
-user namespaces in action. 
+the `root` user even though the container is actually running as the `lab-user`. This is
+user namespaces in action.
 
 .What does the `-l` option do? (check `man podman-top`)
 --
@@ -53,12 +51,12 @@ namespace.
 ====
 * The `sleep` process in the container is owned by `root` but
 the process on the host is owned by `lab-user`. This is
-user namespaces in action. The **fork/exec** model used by podman 
+user namespaces in action. The **fork/exec** model used by podman
 improves the security auditing of containers. It allows an administrator to identify users
 that run containers as root. Container engines that
 use a ***client/server*** model can't provide this.
 
-* The `sleep` process in the container has a PID of 1 but 
+* The `sleep` process in the container has a PID of 1 but
 on the host the PID is greather than 1. This is
 the kernel PID namespace in action.
 ====
@@ -74,7 +72,7 @@ $ *podman rm -f -t 0 sleepy*
 === User namespaces
 
 As we saw in the last example, a running process can have a different UID inside a container
-from outside. This works because the user namespace supports the concept of 
+from outside. This works because the user namespace supports the concept of
 *mapping UID/GIDs from the host to different UIDs and GIDs inside the namespace*.
 
 This mapping is set up with */etc/subuid* and */etc/subgid* on the host. In RHEL 9, this mapping
@@ -136,16 +134,16 @@ We can see this mapping in action
 [source,subs="{markup-in-source}"]
 ----
 $ *podman unshare*
-%UNSHARE_PROMPT%
+{UNSHARE_PROMPT}
 ----
 --
 
 --
 [source,subs="{markup-in-source}"]
 ----
-%UNSHARE_PROMPT% *touch test-file*
-%UNSHARE_PROMPT% *chown 1 test-file*
-%UNSHARE_PROMPT% *ls -l test-file*
+{UNSHARE_PROMPT} *touch test-file*
+{UNSHARE_PROMPT} *chown 1 test-file*
+{UNSHARE_PROMPT} *ls -l test-file*
 ----
 ----
 -rw-r--r--. 1 bin root 0 May 16 13:43 test-file
@@ -159,7 +157,7 @@ and check that it is owned by UID 1 (the *bin* user).
 --
 [source,subs="{markup-in-source}"]
 ----
-%UNSHARE_PROMPT% *exit*
+{UNSHARE_PROMPT} *exit*
 $ *ls -l test-file*
 ----
 ----
@@ -185,7 +183,7 @@ A container administrator can make use *podman's* `--uidmap` option to force a r
 --
 [source,subs="{markup-in-source}"]
 ----
-$ *sudo podman run --uidmap 0:100000:5000 -d %RHEL_CONTAINER% sleep 1000*
+$ *sudo podman run --uidmap 0:100000:5000 -d {RHEL_CONTAINER} sleep 1000*
 ----
 ----
 98554ea68dae250deeaf78d9b20069716e40eeaf1804b070eb408c9894b1df5a
@@ -220,7 +218,7 @@ UID        PID  PPID  C STIME TTY          TIME CMD
 --
 [source,subs="{markup-in-source}"]
 ----
-$ *sudo podman run --uidmap 0:200000:5000 -d %RHEL_CONTAINER% sleep 1000*
+$ *sudo podman run --uidmap 0:200000:5000 -d {RHEL_CONTAINER} sleep 1000*
 ----
 ----
 0da91645b9c5e4d77f16f7834081811543f5d2c5e2a510e3092269cbd536d978
@@ -260,7 +258,7 @@ keeps track of these mappings for logging actions done by users in containers.
 --
 [source,subs="{markup-in-source}"]
 ----
-$ *sudo podman run --name sleepy --rm -it %RHEL_CONTAINER% bash -c "cat /proc/self/loginuid;echo"*
+$ *sudo podman run --name sleepy --rm -it {RHEL_CONTAINER} bash -c "cat /proc/self/loginuid;echo"*
 ----
 ----
 1001
@@ -279,7 +277,7 @@ $ *sudo auditctl -w /etc/shadow 2>/dev/null*
 --
 [source,subs="{markup-in-source}"]
 ----
-$ *sudo podman run --privileged --rm -v /:/host %RHEL_CONTAINER% touch /host/etc/shadow*
+$ *sudo podman run --privileged --rm -v /:/host {RHEL_CONTAINER} touch /host/etc/shadow*
 ----
 --
 
@@ -291,17 +289,17 @@ $ *sudo ausearch -m path -ts recent -i | grep touch | grep --color=auto 'auid=[^
 ----
 [source,subs="{markup-in-source}"]
 ----
-type=SYSCALL msg=audit(04/30/2019 11:03:03.384:425) : arch=x86_64 syscall=openat success=yes exit=3 a0=0xffffff9c a1=0x7ffeee3ecf5c a2=O_WRONLY|O_CREAT|O_NOCTTY|O_NONBLOCK a3=0x1b6 items=2 ppid=6168 pid=6180 *auid=lab-user* uid=root gid=root euid=root suid=root fsuid=root egid=root sgid=root fsgid=root tty=(none) ses=11 comm=touch exe=/usr/bin/coreutils subj=unconfined_u:system_r:spc_t:s0 key=(null) 
+type=SYSCALL msg=audit(04/30/2019 11:03:03.384:425) : arch=x86_64 syscall=openat success=yes exit=3 a0=0xffffff9c a1=0x7ffeee3ecf5c a2=O_WRONLY|O_CREAT|O_NOCTTY|O_NONBLOCK a3=0x1b6 items=2 ppid=6168 pid=6180 *auid=lab-user* uid=root gid=root euid=root suid=root fsuid=root egid=root sgid=root fsgid=root tty=(none) ses=11 comm=touch exe=/usr/bin/coreutils subj=unconfined_u:system_r:spc_t:s0 key=(null)
 ----
 --
 
-TIP: Try this at home using another container engine based on a client/server model and you 
+TIP: Try this at home using another container engine based on a client/server model and you
 will notice that the offending audit ID is reported as `4294967295` (i.e. an `unsignedint(-1)`).
-In other words, the malicious user is unknown.  
+In other words, the malicious user is unknown.
 
 === Challenge
 
-The `--user` argument can be used to tell `podman` to use a specific effective user in the container namespace. In other words, repeat the previous example specifying the user to be `1001` which is `%USERNAME%`.This can be confirmed by examining the `/etc/passwd` file.
+The `--user` argument can be used to tell `podman` to use a specific effective user in the container namespace. In other words, repeat the previous example specifying the user to be `1001` which is `{USERNAME}`.This can be confirmed by examining the `/etc/passwd` file.
 
 .The `top` results should look like:
 --

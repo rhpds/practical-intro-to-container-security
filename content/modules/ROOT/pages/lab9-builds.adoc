@@ -1,14 +1,12 @@
-:GUID: %guid%
-:markup-in-source: verbatim,attributes,quotes
 
 
 This module will introduce _Buildah_, a command line tool for building https://www.opencontainers.org/[Open Container Initiative]
 compatible container images. _Buildah_ is easy to incorporate into scripts and build pipelines, and best of all, it doesn't
 require a running container daemon to build its image. You can read more about _Buildah_ at the https://buildah.io[buildah.io]
 web site. Also, have a look at the https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html-single/building_running_and_managing_containers/index#assembly_building-container-images-with-buildah[buildah]
-chapter in the RHEL 9 documentation. 
+chapter in the RHEL 9 documentation.
 
-=== Scratch builds
+== Scratch builds
 
 Scratch builds allows container images to be built without
 using a Dockerfile or a traditional container base image. It allows for an image to contain the bare minimum to run an application.
@@ -24,7 +22,7 @@ $ *buildah unshare*
 ----
 --
 
-Verify this by comparing the user and process IDs in the modified user namespace and the host. Notice the `buildah` processes on the host are owned by a non-root user. 
+Verify this by comparing the user and process IDs in the modified user namespace and the host. Notice the `buildah` processes on the host are owned by a non-root user.
 
 .View the modified user namespace processes
 --
@@ -59,7 +57,7 @@ lab-user 17420 16988  0 13:26 pts/0    00:00:00 grep --color=auto buildah
 ----
 --
 
-The process information above indicates `root (uid=0)` in the modified user namespace but a rootless user (%USERNAME%) on the host. Can't believe your eyes?
+The process information above indicates `root (uid=0)` in the modified user namespace but a rootless user ({USERNAME}) on the host. Can't believe your eyes?
 
 .Try a command like `cat /etc/shadow` that requires root privileges. Remember, bash is owned by root in the modified user namespace but not in the host's namespace
 --
@@ -138,7 +136,7 @@ NOTE: A few `Permission denied` errors will be reported that can be safely ignor
 --
 [source,subs="{markup-in-source}"]
 ----
-[root@bastion 0 ~]# *yum install -y --setopt=reposdir=/etc/yum.repos.d --installroot=$scratchmnt --setopt=cachedir=var/cache/dnf bash coreutils --setopt install_weak_deps=false* 
+[root@bastion 0 ~]# *yum install -y --setopt=reposdir=/etc/yum.repos.d --installroot=$scratchmnt --setopt=cachedir=var/cache/dnf bash coreutils --setopt install_weak_deps=false*
 ----
 ----
 Installed:
@@ -338,13 +336,13 @@ Untagged: localhost/scratch:latest
 ----
 --
 
-=== Building from Universal Base Images
+== Building from Universal Base Images
 
 Below are the basic steps for building a container image from a UBI. No `Dockerfile` needed. Give it a try! Get creative, the lab is almost finished!
 
 [source,subs="{markup-in-source}"]
 ----
-$ *buildah from --name=myapp %RHEL_CONTAINER%*
+$ *buildah from --name=myapp {RHEL_CONTAINER}*
 $ *buildah run myapp -- dnf -y install python3*
 $ *echo "The container is working." > index.html*
 $ *buildah copy myapp index.html /*
@@ -376,14 +374,14 @@ $ *podman rm -f test*
 ----
 --
 
-=== Build using Docker (BuD)
+== Build using Docker (BuD)
 
 .Create the following `Dockerfile`
 --
 [source,subs="{markup-in-source}"]
 ----
 $ *cat > Dockerfile <<EOF*
-*FROM %RHEL_CONTAINER%*
+*FROM {RHEL_CONTAINER}*
 *LABEL description="Minimal python web server" maintainer="yourname@mail.net"*
 *RUN dnf -y update; dnf -y clean all*
 *RUN dnf -y install python3 --setopt install_weak_deps=false; dnf -y clean all*
@@ -401,7 +399,7 @@ $ *cat > Dockerfile <<EOF*
 $ *buildah bud -t buildahbuddemo Dockerfile*
 ----
 ----
-STEP 1: FROM %RHEL_CONTAINER%
+STEP 1: FROM {RHEL_CONTAINER}
 STEP 2: LABEL description="Minimal python web server" maintainer="yourname@mail.net"
 ...
 ...

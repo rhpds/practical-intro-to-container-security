@@ -1,0 +1,17 @@
+name: modules
+title: A Practical Introduction to Container Security
+version: master
+nav:
+  - modules/ROOT/nav.adoc
+
+asciidoc:
+  attributes:
+    markup-in-source: verbatim,attributes,quotes
+    RHEL_CONTAINER: placehoder_rhel_container
+    GUID: placehoder_guid
+    STUDENT_SSH_COMMAND: placeholder_student_ssh_command
+    STUDENT_SSH_PASSWORD: placeholder_student_ssh_password
+    STUDENT_BASTION_HOSTNAME: placeholder_student_bastion_hostname
+    USERNAME: placehoder_username
+    CONTAINER_PROMPT: placeholder_container_prompt
+    UNSHARE_PROMPT: placeholder_unshare_prompt
