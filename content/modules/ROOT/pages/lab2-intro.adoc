@@ -22,7 +22,7 @@ image::lab-diagram.png[Lab diagram]
 [options="header,footer"]
 |=======================
 |Server   |Function
-|BookBag  |Client as a Service
+|Showroom |Client as a Service
 |bastion  |External ssh and container host
 |node1    |Image registry and  container host
 |node2    |Image registry and  container host
@@ -46,16 +46,15 @@ $ *cat /etc/redhat-release*
 Red Hat Enterprise Linux 9.1 (Plow)
 ----
 
-== BookBag Environment
+== Showroom Environment
 
-BookBag provides a integrated student client environment in a web browser. It includes the lab guide, terminals and a collection of client programs (i.e. `ssh`) to access the servers used in the lab. In case you are interested, BookBag runs as a container and can be hosted by `podman` or https://www.openshift.com[OpenShift]. See `deploy-lab-guide.sh` and `deploy-openshift.md` for details.
+Showroom provides a integrated student client environment in a web browser. It includes the lab guide, terminals and a collection of client programs (i.e. `ssh`) to access the servers used in the lab.
 
 [TIP]
-.BookBag Tips
+.Showroom Tips
 --
 - Increase the width of the web browser to view the table of contents.
 - Move the horizontal and vertical dividers as needed.
-- Use the menu in the upper right to open additional terminals.
 - Commands may be copy and pasted from the lab guide to the terminals.
 --
 
@@ -88,10 +87,10 @@ $ *sudo ssh node1.{GUID}.internal*
 ----
 ****
 
-== BookBag Instance: Optional Configuration
+== Showroom Instance: Optional Configuration
 
 This configuration is optional but helpful. Be certain this is
-performed in the BookBag shell only.
+performed in the Showroom shell only.
 
 .Create a SSH key pair using the default key file with no passphrase
 --
